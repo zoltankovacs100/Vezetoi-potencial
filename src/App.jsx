@@ -42,10 +42,10 @@ const ITEMS = [
 
 // Tartományok definíciói és színek
 const BANDS = [
-  { key: "band1", from: 8, to: 16, label: "Nem ösztönöz, közömbös.", color: "#F7EA00" }, // citromsárga
-  { key: "band2", from: 17, to: 25, label: "Enyhén motivál.", color: "#FFA500" }, // narancs
-  { key: "band3", from: 26, to: 34, label: "Erős ösztönzés, lelkesít.", color: "#2ECC71" }, // zöld
-  { key: "band4", from: 35, to: 40, label: "Nyomást helyez rám, stresszel.", color: "#FF3B30" }, // piros
+  { key: "band1", from: 8, to: 16, label: "Nem ösztönöz, közömbös.", color: "#F7EA00" },
+  { key: "band2", from: 17, to: 25, label: "Enyhén motivál.", color: "#FFA500" },
+  { key: "band3", from: 26, to: 34, label: "Erős ösztönzés, lelkesít.", color: "#2ECC71" },
+  { key: "band4", from: 35, to: 40, label: "Nyomást helyez rám, stresszel.", color: "#FF3B30" },
 ];
 
 function shuffle(array) {
@@ -78,9 +78,6 @@ const Slider = ({ value, onChange }) => {
         onChange={(e) => onChange(Number(e.target.value))}
         aria-label="Likert skála csúszka 1–5"
       />
-      <div className="ticks">
-        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-      </div>
     </div>
   );
 };
@@ -207,8 +204,8 @@ export default function VezetoiPotencialApp() {
           --text: #111;
           --muted: #555;
           --line: #d8d8d8;
-          --brand: #111;
-          --accent: #2e7d32;
+          --brand: #006400; /* sötétzöld */
+          --accent: #008000; /* zöld */
         }
         * { box-sizing: border-box; }
         html, body, #root { height: 100%; }
@@ -235,7 +232,7 @@ export default function VezetoiPotencialApp() {
           width: 100%;
           appearance: none;
           height: 32px;
-          background: linear-gradient(90deg, #eee, #e2e2e2);
+          background: linear-gradient(90deg, var(--brand), var(--accent));
           border-radius: 16px;
           outline: none;
           padding: 0;
@@ -244,23 +241,22 @@ export default function VezetoiPotencialApp() {
         .slider input[type="range"]::-webkit-slider-thumb {
           appearance: none;
           width: 28px; height: 28px; border-radius: 50%;
-          background: #111; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+          background: var(--brand); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
           margin-top: 2px;
         }
         .slider input[type="range"]::-moz-range-thumb {
           width: 28px; height: 28px; border-radius: 50%;
-          background: #111; border: 2px solid #fff;
+          background: var(--brand); border: 2px solid #fff;
         }
-        .slider .ticks {
-          display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--muted);
-        }
+        /* ticks/numbering removed by request */
+        .slider .ticks { display: none; }
 
         .actions { display: flex; gap: 8px; margin: 16px 0; }
         .btn {
           padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid #0000;
         }
-        .btn.primary { background: #111; color: #fff; }
-        .btn.ghost { background: #fff; color: #111; border: 1px solid var(--line); }
+        .btn.primary { background: var(--brand); color: #fff; }
+        .btn.ghost { background: #fff; color: var(--brand); border: 1px solid var(--line); }
 
         .results { margin-top: 12px; }
         .explain { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
@@ -281,11 +277,7 @@ export default function VezetoiPotencialApp() {
           overflow: hidden;
           border: 1px solid var(--line);
         }
-        .barBg {
-          position: absolute; inset: 0;
-          display: grid;
-          grid-template-columns: 20% 2px 22.5% 2px 25% 2px 32.5%;
-        }
+        .barBg { position: absolute; inset: 0; display: grid; grid-template-columns: 20% 2px 22.5% 2px 25% 2px 32.5%; }
         .seg { height: 100%; }
         .seg1 { background: linear-gradient(90deg, #fff9a6, #F7EA00); }
         .seg2 { background: linear-gradient(90deg, #ffd28a, #FFA500); }
@@ -293,9 +285,7 @@ export default function VezetoiPotencialApp() {
         .seg4 { background: linear-gradient(90deg, #ff9a9a, #FF3B30); }
         .segDivider { background: #bdbdbd; }
 
-        .marker {
-          position: absolute; top: 0; bottom: 0; width: 2px; background: #333; transform: translateX(-1px);
-        }
+        .marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #333; transform: translateX(-1px); }
 
         .scaleNums {
           position: absolute; left: 0; right: 0; bottom: 2px;
@@ -313,14 +303,8 @@ export default function VezetoiPotencialApp() {
         .barValue .score { font-weight: 700; }
         .barValue .band { color: var(--muted); }
 
-        .barWrap::after {
-          content: '40';
-          position: absolute; right: 4px; bottom: 2px; font-size: 11px; color: #222;
-        }
-        .barWrap::before {
-          content: '8';
-          position: absolute; left: 4px; bottom: 2px; font-size: 11px; color: #222;
-        }
+        .barWrap::after { content: '40'; position: absolute; right: 4px; bottom: 2px; font-size: 11px; color: #222; }
+        .barWrap::before { content: '8'; position: absolute; left: 4px; bottom: 2px; font-size: 11px; color: #222; }
 
         .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
         .legendItem { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
