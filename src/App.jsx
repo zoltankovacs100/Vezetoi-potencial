@@ -40,6 +40,14 @@ const ITEMS = [
   { id: 24, dim: "C", text: "Érték-inkongruencia esetén erős késztetést érzek az azonnali változtatásra vagy váltásra." },
 ];
 
+const A_TITLE = "Agilitás és ambíció";
+const B_TITLE = "Kisiklási kockázatok, halogatási hajlandóság";
+const C_TITLE = "Illeszkedés, értékrend, kultúra";
+
+const A_DESC = "Az új helyzetekhez való gyors alkalmazkodás és erős teljesítményhajtóerő együttese, amely előmozdítja a cselekvést, de túlhasználat esetén, nyomást, kényszerteljesítést okozhat.";
+const B_DESC = "Perfekcionizmus, impulzivitás, amelyek döntési késlekedést, fókuszvesztést és teljesítményingadozást idézhetnek elő.";
+const C_DESC = "Normák, motiváció és viselkedési minták összhangja, együttműködés a szervezeti kultúrával, amely erősíti a elköteleződést, míg ütközés esetén feszültséget és demotivációt okozhat.";
+
 // Tartományok definíciói és színek
 const BANDS = [
   { key: "band1", from: 8, to: 16, label: "Nem ösztönöz, közömbös.", color: "#F7EA00" },
@@ -163,21 +171,25 @@ export default function VezetoiPotencialApp() {
 
         {evaluated && (
           <div id="resultSection" className="results">
-            {/* magyarázó szöveg eltávolítva kérésre */}
-
             <div className="bars">
-              <BarWithBands label="-A-" score={evaluated.A} />
-              <BarWithBands label="-B-" score={evaluated.B} />
-              <BarWithBands label="-C-" score={evaluated.C} />
+              <BarWithBands label={A_TITLE} score={evaluated.A} />
+              <BarWithBands label={B_TITLE} score={evaluated.B} />
+              <BarWithBands label={C_TITLE} score={evaluated.C} />
             </div>
 
-            <div className="legend">
-              {BANDS.map(b => (
-                <div className="legendItem" key={b.key}>
-                  <span className="dot" style={{ background: b.color }} />
-                  <span>{b.from}–{b.to}: {b.label}</span>
-                </div>
-              ))}
+            <div className="definitions">
+              <div className="defItem">
+                <div className="defTitle">{A_TITLE}</div>
+                <div className="defText">{A_DESC}</div>
+              </div>
+              <div className="defItem">
+                <div className="defTitle">{B_TITLE}</div>
+                <div className="defText">{B_DESC}</div>
+              </div>
+              <div className="defItem">
+                <div className="defTitle">{C_TITLE}</div>
+                <div className="defText">{C_DESC}</div>
+              </div>
             </div>
 
             <div className="actions no-print">
@@ -193,9 +205,9 @@ export default function VezetoiPotencialApp() {
           --text: #111;
           --muted: #555;
           --line: #d8d8d8;
-          --brand: #006400; /* sötétzöld */
-          --accent: #008000; /* zöld */
-          --button: #7B1FA2; /* komplementer lila gombokhoz */
+          --brand: #006400;
+          --accent: #008000;
+          --button: #7B1FA2;
           --button-hover: #6A1B9A;
         }
         * { box-sizing: border-box; }
@@ -222,7 +234,7 @@ export default function VezetoiPotencialApp() {
         .slider input[type="range"] {
           width: 100%;
           appearance: none;
-          height: 12px; /* vékonyabb pálya */
+          height: 12px;
           background: linear-gradient(90deg, var(--accent) 0%, var(--brand) 100%);
           border-radius: 999px;
           outline: none;
@@ -233,7 +245,7 @@ export default function VezetoiPotencialApp() {
           appearance: none;
           width: 20px; height: 20px; border-radius: 50%;
           background: var(--brand); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
-          margin-top: -4px; /* igazítás a vékony pályához */
+          margin-top: -4px;
         }
         .slider input[type="range"]::-moz-range-thumb {
           width: 20px; height: 20px; border-radius: 50%;
@@ -256,7 +268,7 @@ export default function VezetoiPotencialApp() {
 
         .barRow {
           display: grid;
-          grid-template-columns: 60px 1fr 160px;
+          grid-template-columns: 1fr 2fr 160px; /* harmonikusabb súlyozás */
           gap: 12px;
           align-items: center;
         }
@@ -268,7 +280,6 @@ export default function VezetoiPotencialApp() {
           overflow: hidden;
           border: 1px solid var(--line);
         }
-        /* Folyamatos, elmosott színátmenet a teljes skálán */
         .barBg {
           position: absolute; inset: 0;
           background: linear-gradient(90deg,
@@ -301,16 +312,19 @@ export default function VezetoiPotencialApp() {
         .barWrap::after { content: '40'; position: absolute; right: 4px; bottom: 2px; font-size: 11px; color: #222; }
         .barWrap::before { content: '8'; position: absolute; left: 4px; bottom: 2px; font-size: 11px; color: #222; }
 
-        .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-        .legendItem { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
-        .legendItem .dot { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #999; }
+        .definitions {
+          display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 8px;
+        }
+        .defItem { background: #fafafa; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+        .defTitle { font-weight: 700; margin-bottom: 4px; }
+        .defText { color: var(--muted); font-size: 13px; }
 
         @media (max-width: 640px) {
           .question { padding: 10px; }
           .qText { font-size: 14.5px; }
-          .barRow { grid-template-columns: 40px 1fr; }
-          .barValue { grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 6px; }
+          .barRow { grid-template-columns: 1fr; }
           .barLabel { text-align: left; }
+          .barValue { display: flex; gap: 12px; margin-top: 6px; }
           .actions { position: sticky; bottom: 8px; background: #fff; padding: 8px 0; }
           .btn { flex: 1; }
         }
@@ -320,6 +334,7 @@ export default function VezetoiPotencialApp() {
           body { background: #fff; }
           .question { break-inside: avoid; }
           .barRow { break-inside: avoid; }
+          .defItem { break-inside: avoid; }
         }
       `}</style>
     </div>
