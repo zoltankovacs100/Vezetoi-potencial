@@ -89,15 +89,7 @@ const BarWithBands = ({ label, score }) => {
     <div className="barRow">
       <div className="barLabel">{label}</div>
       <div className="barWrap">
-        <div className="barBg">
-          <div className="seg seg1" />
-          <div className="segDivider" />
-          <div className="seg seg2" />
-          <div className="segDivider" />
-          <div className="seg seg3" />
-          <div className="segDivider" />
-          <div className="seg seg4" />
-        </div>
+        <div className="barBg" />
         <div className="marker" style={{ left: `${percent}%` }} />
         <div className="scaleNums">
           <span className="snum s8">8</span>
@@ -171,10 +163,7 @@ export default function VezetoiPotencialApp() {
 
         {evaluated && (
           <div id="resultSection" className="results">
-            <div className="explain">
-              Magasabb pont = nagyobb kockázat/nyomás. Zónák: 8–16 (citromsárga), 17–25 (narancs),
-              26–34 (zöld), 35–40 (piros). A függőleges jelölő az összpont helyét mutatja.
-            </div>
+            {/* magyarázó szöveg eltávolítva kérésre */}
 
             <div className="bars">
               <BarWithBands label="-A-" score={evaluated.A} />
@@ -206,6 +195,8 @@ export default function VezetoiPotencialApp() {
           --line: #d8d8d8;
           --brand: #006400; /* sötétzöld */
           --accent: #008000; /* zöld */
+          --button: #7B1FA2; /* komplementer lila gombokhoz */
+          --button-hover: #6A1B9A;
         }
         * { box-sizing: border-box; }
         html, body, #root { height: 100%; }
@@ -231,35 +222,35 @@ export default function VezetoiPotencialApp() {
         .slider input[type="range"] {
           width: 100%;
           appearance: none;
-          height: 32px;
-          background: linear-gradient(90deg, var(--brand), var(--accent));
-          border-radius: 16px;
+          height: 12px; /* vékonyabb pálya */
+          background: linear-gradient(90deg, var(--accent) 0%, var(--brand) 100%);
+          border-radius: 999px;
           outline: none;
           padding: 0;
           margin: 0;
         }
         .slider input[type="range"]::-webkit-slider-thumb {
           appearance: none;
-          width: 28px; height: 28px; border-radius: 50%;
+          width: 20px; height: 20px; border-radius: 50%;
           background: var(--brand); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
-          margin-top: 2px;
+          margin-top: -4px; /* igazítás a vékony pályához */
         }
         .slider input[type="range"]::-moz-range-thumb {
-          width: 28px; height: 28px; border-radius: 50%;
+          width: 20px; height: 20px; border-radius: 50%;
           background: var(--brand); border: 2px solid #fff;
         }
-        /* ticks/numbering removed by request */
         .slider .ticks { display: none; }
 
         .actions { display: flex; gap: 8px; margin: 16px 0; }
         .btn {
           padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid #0000;
+          transition: background-color .15s ease, color .15s ease, border-color .15s ease;
         }
-        .btn.primary { background: var(--brand); color: #fff; }
-        .btn.ghost { background: #fff; color: var(--brand); border: 1px solid var(--line); }
+        .btn.primary { background: var(--button); color: #fff; }
+        .btn.primary:hover { background: var(--button-hover); }
+        .btn.ghost { background: #fff; color: var(--button); border: 1px solid var(--button); }
 
         .results { margin-top: 12px; }
-        .explain { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
 
         .bars { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
@@ -272,18 +263,22 @@ export default function VezetoiPotencialApp() {
         .barLabel { font-weight: 700; text-align: right; }
         .barWrap {
           position: relative;
-          height: 40px;
+          height: 44px;
           border-radius: 12px;
           overflow: hidden;
           border: 1px solid var(--line);
         }
-        .barBg { position: absolute; inset: 0; display: grid; grid-template-columns: 20% 2px 22.5% 2px 25% 2px 32.5%; }
-        .seg { height: 100%; }
-        .seg1 { background: linear-gradient(90deg, #fff9a6, #F7EA00); }
-        .seg2 { background: linear-gradient(90deg, #ffd28a, #FFA500); }
-        .seg3 { background: linear-gradient(90deg, #b3f1c8, #2ECC71); }
-        .seg4 { background: linear-gradient(90deg, #ff9a9a, #FF3B30); }
-        .segDivider { background: #bdbdbd; }
+        /* Folyamatos, elmosott színátmenet a teljes skálán */
+        .barBg {
+          position: absolute; inset: 0;
+          background: linear-gradient(90deg,
+            #fff9a6 0%,
+            #F7EA00 18%,
+            #FFA500 40%,
+            #2ECC71 68%,
+            #FF3B30 100%
+          );
+        }
 
         .marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #333; transform: translateX(-1px); }
 
