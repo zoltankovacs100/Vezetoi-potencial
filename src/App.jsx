@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useRef } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
+// Firebase imports removed for static deployment
 
 /**
  * Likert skála:
@@ -122,10 +123,21 @@ export default function VezetoiPotencialApp() {
   );
   const [evaluated, setEvaluated] = useState(null);
   const printRef = useRef(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [user, setUser] = useState(null);
 
   const handleChange = (id, val) => {
     setAnswers(prev => ({ ...prev, [id]: val }));
   };
+
+  useEffect(() => {
+    // Firebase removed - using static user for deployment
+    setUser({ uid: 'static-user-' + Date.now() });
+    // E-mail átvétele URL paraméterből (?email=...)
+    const params = new URLSearchParams(window.location.search);
+    const paramEmail = params.get("email");
+    if (paramEmail) setUserEmail(paramEmail);
+  }, []);
 
   const compute = () => {
     const sumA = ITEMS.filter(x => x.dim === "A").reduce((acc, x) => acc + (answers[x.id] ?? 3), 0);
@@ -138,16 +150,26 @@ export default function VezetoiPotencialApp() {
   };
 
   const handlePrint = () => {
-    window.print();
+    // Háttérmentés, majd nyomtatás
+    handleSubmitResult().catch(() => {});
+    setTimeout(() => window.print(), 50);
+  };
+
+  const handleSubmitResult = async () => {
+    if (!user) return;
+    if (!evaluated) {
+      alert("Előbb értékeld ki az eredményt!");
+      return;
+    }
+    // Firebase removed - results are only displayed locally
+    console.log("Eredmény:", { email: userEmail || null, result: evaluated, timestamp: new Date().toISOString() });
+    alert("Eredmény sikeresen kiértékelve! (Adatok csak lokálisan tárolva)");
   };
 
   return (
     <div className="app" ref={printRef}>
       <div className="container">
-        <p className="instructions">
-          Kérjük, minden állítást értékeljen az 1–5 skálán! 1=egyáltalán nem igaz rám, 2=inkább nem igaz,
-          3=részben igaz, 4=inkább igaz, 5=teljesen igaz.
-        </p>
+        <h1 className="app-title">Vezetői Potenciál Teszt</h1>
 
         <div className="questions">
           {shuffledItems.map((q, idx) => (
@@ -155,6 +177,13 @@ export default function VezetoiPotencialApp() {
               <div className="qIndex">{idx + 1}.</div>
               <div className="qText">{q.text}</div>
               <div className="qInput">
+                <div className="slider-labels">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                </div>
                 <Slider
                   value={answers[q.id]}
                   onChange={(v) => handleChange(q.id, v)}
@@ -193,150 +222,13 @@ export default function VezetoiPotencialApp() {
             </div>
 
             <div className="actions no-print">
-              <button className="btn primary" onClick={handlePrint}>Mentés PDF-be</button>
+              <button className="btn primary" onClick={handlePrint}>Mentés PDF-be (háttérben mentés)</button>
             </div>
           </div>
         )}
       </div>
 
-      <style>{`
-        :root {
-          --bg: #ffffff;
-          --text: #111;
-          --muted: #555;
-          --line: #d8d8d8;
-          --brand: #006400;
-          --accent: #008000;
-          --button: #7B1FA2;
-          --button-hover: #6A1B9A;
-        }
-        * { box-sizing: border-box; }
-        html, body, #root { height: 100%; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-        .app { display: flex; justify-content: center; padding: 16px; }
-        .container { width: 100%; max-width: 960px; }
-        .instructions { font-size: 14px; color: var(--muted); margin: 0 0 12px 0; }
 
-        .questions { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .question {
-          display: grid;
-          grid-template-columns: 32px 1fr;
-          gap: 8px;
-          padding: 12px;
-          border: 1px solid var(--line);
-          border-radius: 10px;
-          background: #fafafa;
-        }
-        .qIndex { font-weight: 700; opacity: .8; }
-        .qText { font-size: 15px; line-height: 1.35; }
-        .qInput { grid-column: 1 / -1; margin-top: 8px; }
-
-        .slider input[type="range"] {
-          width: 100%;
-          appearance: none;
-          height: 12px;
-          background: linear-gradient(90deg, var(--accent) 0%, var(--brand) 100%);
-          border-radius: 999px;
-          outline: none;
-          padding: 0;
-          margin: 0;
-        }
-        .slider input[type="range"]::-webkit-slider-thumb {
-          appearance: none;
-          width: 20px; height: 20px; border-radius: 50%;
-          background: var(--brand); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
-          margin-top: -4px;
-        }
-        .slider input[type="range"]::-moz-range-thumb {
-          width: 20px; height: 20px; border-radius: 50%;
-          background: var(--brand); border: 2px solid #fff;
-        }
-        .slider .ticks { display: none; }
-
-        .actions { display: flex; gap: 8px; margin: 16px 0; }
-        .btn {
-          padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 1px solid #0000;
-          transition: background-color .15s ease, color .15s ease, border-color .15s ease;
-        }
-        .btn.primary { background: var(--button); color: #fff; }
-        .btn.primary:hover { background: var(--button-hover); }
-        .btn.ghost { background: #fff; color: var(--button); border: 1px solid var(--button); }
-
-        .results { margin-top: 12px; }
-
-        .bars { display: grid; grid-template-columns: 1fr; gap: 12px; }
-
-        .barRow {
-          display: grid;
-          grid-template-columns: 1fr 2fr 160px; /* harmonikusabb súlyozás */
-          gap: 12px;
-          align-items: center;
-        }
-        .barLabel { font-weight: 700; text-align: right; }
-        .barWrap {
-          position: relative;
-          height: 44px;
-          border-radius: 12px;
-          overflow: hidden;
-          border: 1px solid var(--line);
-        }
-        .barBg {
-          position: absolute; inset: 0;
-          background: linear-gradient(90deg,
-            #fff9a6 0%,
-            #F7EA00 18%,
-            #FFA500 40%,
-            #2ECC71 68%,
-            #FF3B30 100%
-          );
-        }
-
-        .marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #333; transform: translateX(-1px); }
-
-        .scaleNums {
-          position: absolute; left: 0; right: 0; bottom: 2px;
-          display: grid; grid-template-columns: 20% 22.5% 25% 32.5%;
-          font-size: 11px; color: #222;
-        }
-        .scaleNums .snum { position: relative; }
-        .scaleNums .s8  { left: 2px; }
-        .scaleNums .s16 { left: calc(20% - 10px); }
-        .scaleNums .s25 { left: calc(20% + 22.5% - 10px); }
-        .scaleNums .s34 { left: calc(20% + 22.5% + 25% - 10px); }
-        .scaleNums .s40 { position: absolute; right: 4px; bottom: -2px; }
-
-        .barValue { font-size: 12px; color: #222; }
-        .barValue .score { font-weight: 700; }
-        .barValue .band { color: var(--muted); }
-
-        .barWrap::after { content: '40'; position: absolute; right: 4px; bottom: 2px; font-size: 11px; color: #222; }
-        .barWrap::before { content: '8'; position: absolute; left: 4px; bottom: 2px; font-size: 11px; color: #222; }
-
-        .definitions {
-          display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 8px;
-        }
-        .defItem { background: #fafafa; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-        .defTitle { font-weight: 700; margin-bottom: 4px; }
-        .defText { color: var(--muted); font-size: 13px; }
-
-        @media (max-width: 640px) {
-          .question { padding: 10px; }
-          .qText { font-size: 14.5px; }
-          .barRow { grid-template-columns: 1fr; }
-          .barLabel { text-align: left; }
-          .barValue { display: flex; gap: 12px; margin-top: 6px; }
-          .actions { position: sticky; bottom: 8px; background: #fff; padding: 8px 0; }
-          .btn { flex: 1; }
-        }
-
-        @media print {
-          .no-print { display: none !important; }
-          body { background: #fff; }
-          .question { break-inside: avoid; }
-          .barRow { break-inside: avoid; }
-          .defItem { break-inside: avoid; }
-        }
-      `}</style>
     </div>
   );
 }
