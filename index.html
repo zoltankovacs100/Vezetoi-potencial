@@ -9,5 +9,42 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+function sendHeightToParent() {
+    const height = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+    );
+    
+    // Küldés a szülő oldalnak
+    window.parent.postMessage({
+        type: 'resize',
+        height: height
+    }, '*');
+}
+
+// Eseménykezelők
+window.addEventListener('load', sendHeightToParent);
+window.addEventListener('resize', sendHeightToParent);
+
+// Dinamikus tartalom változás figyelése
+const observer = new MutationObserver(function() {
+    setTimeout(sendHeightToParent, 100); // Kis késleltetés a render után
+});
+
+observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true
+});
+
+// Kézi hívás esetére
+if (document.readyState === 'complete') {
+    sendHeightToParent();
+}
+</script>
   </body>
 </html>
