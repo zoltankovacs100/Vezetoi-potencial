@@ -1,0 +1,5 @@
+[33m6c0e5f9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Tisztítás: csak Vezetői Potenciál fájlok maradtak
+[33m4ad92b9[m Visszaállítási pont
+[33mab0f0fd[m Initial commit: Vezetői Potenciál Teszt app with all features
+[33mbc1ea90[m content: replace A/B/C labels with descriptive titles, add definitions under charts
+[33m42a85b8[m ui: thinner green gradient slider, purple buttons, continuous gradient bars, remove explanation
