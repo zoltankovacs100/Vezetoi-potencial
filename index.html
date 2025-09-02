@@ -11,6 +11,12 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
 function sendHeightToParent() {
+    // Iframe ellenőrzés és scroll kikapcsolása
+    if (window.parent !== window) {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    }
+    
     const height = Math.max(
         document.body.scrollHeight,
         document.body.offsetHeight,
