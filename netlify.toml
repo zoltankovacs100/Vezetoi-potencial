@@ -1,7 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
 [[headers]]
   for = "/*"
   [headers.values]
-<<<<<<< HEAD
     # Csak a saját domainről és aldomainjeiről engedélyezi az iframe megjelenést
     Content-Security-Policy = "frame-ancestors 'self' https://vistaverde.hu https://*.vistaverde.hu"
     # Régebbi böngészők támogatása, kompatibilis a CSP-vel
@@ -10,19 +13,3 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-
-
-
-
-
-
-
-
-
-=======
-    Content-Security-Policy = "frame-ancestors 'self' https://vistaverde.hu https://*.vistaverde.hu"
-    X-Frame-Options = "SAMEORIGIN"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
->>>>>>> 9b3636240f55a0813faa45b12950b661e1c2c5e4
