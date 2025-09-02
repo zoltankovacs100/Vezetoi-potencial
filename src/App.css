@@ -15,6 +15,13 @@ body {
   background: #f5f5f5;
   min-height: 100vh;
   color: #333;
+  /* Iframe scroll kikapcsolása */
+  overflow: hidden;
+}
+
+html {
+  /* Dupla scroll elkerülése iframe-ben */
+  overflow: hidden;
 }
 
 .app {
