@@ -1,21 +1,8 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Csak a saját domainről és aldomainjeiről engedélyezi az iframe megjelenést
     Content-Security-Policy = "frame-ancestors 'self' https://vistaverde.hu https://*.vistaverde.hu"
-    # Régebbi böngészők miatt, de modern helyett inkább CSP-t használj
     X-Frame-Options = "SAMEORIGIN"
-    # Egyéb biztonsági fejlécek javasoltak lehetnek
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-
-
-
-
-
-
-
-
-
-
