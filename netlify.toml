@@ -5,7 +5,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "frame-ancestors 'self' https://vistaverde.hu https://*.vistaverde.hu"
+    Content-Security-Policy = "frame-ancestors 'self' https://vistaverde.hu https://*.vistaverde.hu https://vallalatikepzesek.hu https://*.vallalatikepzesek.hu"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
