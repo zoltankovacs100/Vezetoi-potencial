@@ -11,10 +11,22 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
 function sendHeightToParent() {
-    // Iframe ellenőrzés és scroll kikapcsolása
+    // Iframe ellenőrzés
     if (window.parent !== window) {
+        // Scroll kikapcsolása iframe-ben
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
+        
+        // App konténer méretének igazítása a szülő iframe méretéhez
+        const app = document.querySelector('.app');
+        const container = document.querySelector('.container');
+        
+        if (app && container) {
+            app.style.minHeight = '100vh';
+            app.style.height = 'auto';
+            container.style.minHeight = 'calc(100vh - 40px)';
+            container.style.height = 'auto';
+        }
     }
     
     const height = Math.max(
@@ -36,21 +48,34 @@ function sendHeightToParent() {
 window.addEventListener('load', sendHeightToParent);
 window.addEventListener('resize', sendHeightToParent);
 
-// Dinamikus tartalom változás figyelése
+// Dinamikus tartalom változás figyelése - gyakoribb ellenőrzés
 const observer = new MutationObserver(function() {
-    setTimeout(sendHeightToParent, 100); // Kis késleltetés a render után
+    setTimeout(sendHeightToParent, 50); // Rövidebb késleltetés
 });
 
 observer.observe(document.body, {
     childList: true,
     subtree: true,
-    attributes: true
+    attributes: true,
+    characterData: true
 });
 
 // Kézi hívás esetére
 if (document.readyState === 'complete') {
     sendHeightToParent();
+} else {
+    setTimeout(sendHeightToParent, 500); // Biztonsági hívás
 }
+
+// Periodikus ellenőrzés az első 10 másodpercben
+let checkCount = 0;
+const periodicCheck = setInterval(() => {
+    sendHeightToParent();
+    checkCount++;
+    if (checkCount >= 20) { // 10 másodperc után leállítjuk
+        clearInterval(periodicCheck);
+    }
+}, 500);
 </script>
   </body>
 </html>
