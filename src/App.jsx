@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import QRCode from "qrcode";
 // Firebase imports removed for static deployment
 
 /**
@@ -10,32 +11,33 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
  */
 
 const ITEMS = [
-  // -A- (1–8)
-  { id: 1, dim: "A", text: "Gyakran vállalok több, nagy láthatóságú feladatot egyszerre, még ha ez túlterheltséghez vezet." },
+  // -A- (1–8) - Updated with better alignment
   { id: 2, dim: "A", text: "Változáskor nagyon gyorsan váltok, még akkor is, ha ezzel a stabil végrehajtást kockáztatom." },
-  { id: 3, dim: "A", text: "Hajlamos vagyok azonnali eredményt várni a visszajelzések után, ami feszültséget kelt a csapatban." },
-  { id: 4, dim: "A", text: "Versenyhelyzetben erősen rákapcsolok, és ez gyakran szorongást vagy nyomást generál bennem." },
   { id: 5, dim: "A", text: "Új kihívásoknál inkább belevágok tervezés nélkül, ami később kapkodást okozhat." },
   { id: 6, dim: "A", text: "Ha elérjük a célt, azonnal magasabb mércét állítok, ami kimerüléshez is vezethet." },
-  { id: 7, dim: "A", text: "Kommunikációs stílusomat gyakran erőteljesre állítom, ami ellenállást válthat ki másokból." },
   { id: 8, dim: "A", text: "Nyomás alatt az eredménykényszer miatt kevésbé figyelek a hosszú távú következményekre." },
+  { id: 17, dim: "A", text: "Erősen hajt az egyéni teljesítmény és verseny, ami időnként feszültséget okoz csapatmunkában." },
+  { id: 19, dim: "A", text: "Magas autonómiát igényelek; ha ezt korlátozzák, frusztrálttá válok." },
+  { id: 21, dim: "A", text: "Változatos szerepekben szeretek mozogni; ha ellaposodik a feladatkör, gyorsan demotiválódom." },
+  { id: 25, dim: "A", text: "Ambiciózus célokat tűzök ki magam elé, még ha ez túlzott nyomást helyez rám." },
 
-  // -B- (9–16)
+  // -B- (9–16) - Updated with moved questions
+  { id: 1, dim: "B", text: "Gyakran vállalok több, nagy láthatóságú feladatot egyszerre, még ha ez túlterheltséghez vezet." },
+  { id: 3, dim: "B", text: "Hajlamos vagyok azonnali eredményt várni a visszajelzések után, ami feszültséget kelt a csapatban." },
+  { id: 4, dim: "B", text: "Versenyhelyzetben erősen rákapcsolok, és ez gyakran szorongást vagy nyomást generál bennem." },
   { id: 9, dim: "B", text: "Gyakran addig tökéletesítek egy feladatot, hogy emiatt kicsúszok a határidőből." },
   { id: 10, dim: "B", text: "Fontos döntéseket többször elhalasztok, bízva benne, hogy magától tisztul a kép." },
-  { id: 11, dim: "B", text: "Konfliktusveszély esetén inkább elkerülöm a megbeszélést, még ha ez hátráltat is." },
   { id: 12, dim: "B", text: "Nyomás alatt kapkodok, és emiatt ismétlődő hibákat vétek." },
-  { id: 13, dim: "B", text: "Ha nincs „tökéletes” megoldás, késlekedem az elkezdéssel." },
+  { id: 13, dim: "B", text: "Ha nincs \"tökéletes\" megoldás, késlekedem az elkezdéssel." },
   { id: 14, dim: "B", text: "Könnyen átcsúszom sürgős, de kevésbé fontos feladatokba a stratégiai munka helyett." },
-  { id: 15, dim: "B", text: "Visszajelzés előtt ritkán vállalok határozott álláspontot, tartva a kritikától." },
   { id: 16, dim: "B", text: "Kudarc után hosszan tartóan visszaesik a teljesítményem és a motivációm." },
 
-  // -C- (17–24)
-  { id: 17, dim: "C", text: "Erősen hajt az egyéni teljesítmény és verseny, ami időnként feszültséget okoz csapatmunkában." },
+  // -C- (17–24) - Updated with moved question and rebalanced
+  { id: 7, dim: "C", text: "Kommunikációs stílusomat gyakran erőteljesre állítom, ami ellenállást válthat ki másokból." },
+  { id: 11, dim: "C", text: "Konfliktusveszély esetén inkább elkerülöm a megbeszélést, még ha ez hátráltat is." },
+  { id: 15, dim: "C", text: "Visszajelzés előtt ritkán vállalok határozott álláspontot, tartva a kritikától." },
   { id: 18, dim: "C", text: "Ha a munka nem szolgál észszerű közösségi/jó ügyet, erős belső ellenállást érzek." },
-  { id: 19, dim: "C", text: "Magas autonómiát igényelek; ha ezt korlátozzák, frusztrálttá válok." },
   { id: 20, dim: "C", text: "Ha a szervezet gyakorlata nem tükrözi az értékeimet (pl. átláthatóság), az erősen nyomaszt." },
-  { id: 21, dim: "C", text: "Változatos szerepekben szeretek mozogni; ha ellaposodik a feladatkör, gyorsan demotiválódom." },
   { id: 22, dim: "C", text: "Ha a napi feladatok nem illeszkednek a hosszú távú karriercéljaimhoz, jelentős stresszt érzek." },
   { id: 23, dim: "C", text: "Ha kevés teret kapok mások fejlesztésére/csapatszintű felelősségre, elégedetlenné válok." },
   { id: 24, dim: "C", text: "Érték-inkongruencia esetén erős késztetést érzek az azonnali változtatásra vagy váltásra." },
@@ -91,28 +93,50 @@ const Slider = ({ value, onChange }) => {
   );
 };
 
-const BarWithBands = ({ label, score }) => {
+const BarWithBands = ({ label, score, showLegend = false }) => {
   const percent = scalePercent(score);
   const currentBand = bandFor(score);
   return (
-    <div className="barRow">
-      <div className="barLabel">{label}</div>
-      <div className="barWrap">
-        <div className="barBg" />
-        <div className="marker" style={{ left: `${percent}%` }} />
-        <div className="scaleNums">
-          <span className="snum s8">8</span>
-          <span className="snum s16">16</span>
-          <span className="snum s25">25</span>
-          <span className="snum s34">34</span>
-          <span className="snum s40">40</span>
+    <>
+      <div className="barRow">
+        <div className="barLabel">{label}</div>
+        <div className="barWrap">
+          <div className="barBg" />
+          <div className="marker" style={{ left: `${percent}%` }} />
+          <div className="scaleNums">
+            <span className="snum s8">8</span>
+            <span className="snum s16">16</span>
+            <span className="snum s25">25</span>
+            <span className="snum s34">34</span>
+            <span className="snum s40">40</span>
+          </div>
+        </div>
+        <div className="barValue">
+          <div className="score">{score ?? "__"} pont</div>
+          <div className="band">{currentBand ? currentBand.label : ""}</div>
         </div>
       </div>
-      <div className="barValue">
-        <div className="score">{score ?? "__"} pont</div>
-        <div className="band">{currentBand ? currentBand.label : ""}</div>
-      </div>
-    </div>
+      {showLegend && (
+        <div className="barLegend">
+          <div className="legend-item">
+            <span className="legend-range">8-16</span>
+            <span className="legend-label">Nem ösztönöz, közömbös</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-range">17-25</span>
+            <span className="legend-label">Enyhén motivál</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-range">26-34</span>
+            <span className="legend-label">Erős ösztönzés, lelkesít</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-range">35-40</span>
+            <span className="legend-label">Nyomást helyez rám, stresszel</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -125,6 +149,8 @@ export default function VezetoiPotencialApp() {
   const printRef = useRef(null);
   const [userEmail, setUserEmail] = useState("");
   const [user, setUser] = useState(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState(null);
+  const [showQrCode, setShowQrCode] = useState(false);
 
   const handleChange = (id, val) => {
     setAnswers(prev => ({ ...prev, [id]: val }));
@@ -166,6 +192,30 @@ export default function VezetoiPotencialApp() {
     alert("Eredmény sikeresen kiértékelve! (Adatok csak lokálisan tárolva)");
   };
 
+  const generateQrCode = async () => {
+    try {
+      // Generate QR code with fixed production URL for mobile access
+      const targetUrl = "https://vezetoi-potencial.vistaverde.hu/";
+      const qrDataUrl = await QRCode.toDataURL(targetUrl, {
+        width: 200,
+        margin: 1,
+        color: {
+          dark: '#155724',
+          light: '#FFFFFF'
+        }
+      });
+      setQrCodeDataUrl(qrDataUrl);
+      setShowQrCode(true);
+    } catch (error) {
+      console.error('QR kód generálása sikertelen:', error);
+      alert('QR kód generálása sikertelen!');
+    }
+  };
+
+  const closeQrCode = () => {
+    setShowQrCode(false);
+  };
+
   return (
     <div className="app" ref={printRef}>
       <div className="container">
@@ -196,6 +246,7 @@ export default function VezetoiPotencialApp() {
         <div className="actions no-print">
           <button className="btn primary" onClick={compute}>Kiértékelés</button>
           <button className="btn ghost" onClick={handlePrint}>Mentés PDF-be</button>
+          <button className="btn ghost" onClick={generateQrCode}>QR kód mobilhoz</button>
         </div>
 
         {evaluated && (
@@ -203,7 +254,7 @@ export default function VezetoiPotencialApp() {
             <div className="bars">
               <BarWithBands label={A_TITLE} score={evaluated.A} />
               <BarWithBands label={B_TITLE} score={evaluated.B} />
-              <BarWithBands label={C_TITLE} score={evaluated.C} />
+              <BarWithBands label={C_TITLE} score={evaluated.C} showLegend={true} />
             </div>
 
             <div className="definitions">
@@ -228,7 +279,22 @@ export default function VezetoiPotencialApp() {
         )}
       </div>
 
-
+      {/* QR Code Modal */}
+      {showQrCode && (
+        <div className="qr-modal no-print" onClick={closeQrCode}>
+          <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="qr-modal-header">
+              <h3>QR kód mobil kitöltéshez</h3>
+              <button className="qr-close-btn" onClick={closeQrCode}>&times;</button>
+            </div>
+            <div className="qr-modal-body">
+              <p>Olvasd be ezt a QR kódot telefonoddal a teszt mobil kitöltéséhez:</p>
+              {qrCodeDataUrl && <img src={qrCodeDataUrl} alt="QR Code" className="qr-code-image" />}
+              <p className="qr-note">A QR kód ugyanezt az oldalt nyitja meg mobilon optimalizált nézetnél.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
