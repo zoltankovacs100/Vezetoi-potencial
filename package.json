@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^7.1.0",
-    "@vitejs/plugin-react": "^5.0.2"
+    "@vitejs/plugin-react": "^5.0.2",
+    "vite": "^7.1.0"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
+    "qrcode": "^1.5.4",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "html2canvas": "^1.4.1"
+    "react-dom": "^19.1.1"
   }
 }
