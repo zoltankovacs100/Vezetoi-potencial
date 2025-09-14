@@ -547,10 +547,9 @@ body {
   }
   
   .results {
-    break-before: page;
-    page-break-before: always;
     break-inside: avoid;
     page-break-inside: avoid;
+    margin-top: 30px;
   }
   
   .bars {
