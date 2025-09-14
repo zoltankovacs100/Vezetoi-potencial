@@ -231,7 +231,6 @@ export default function VezetoiPotencialApp() {
   return (
     <div className="app" ref={printRef}>
       <div className="container">
-        <h1 className="app-title">Vezetői Potenciál Teszt</h1>
 
         <div className="questions">
           {shuffledItems.map((q, idx) => (
