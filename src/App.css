@@ -94,7 +94,11 @@ body {
 .slider {
   width: 100%;
   position: relative;
+  padding: 5px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
+
 
 .slider-labels {
   display: flex;
@@ -123,19 +127,30 @@ body {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #155724;
+  background: white;
+  border: 3px solid #ccc;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider.answered input[type="range"]::-webkit-slider-thumb {
+  background: #2ECC71;
+  border: 3px solid #2ECC71;
 }
 
 .slider input[type="range"]::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #155724;
+  background: white;
+  border: 3px solid #ccc;
   cursor: pointer;
-  border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider.answered input[type="range"]::-moz-range-thumb {
+  background: #2ECC71;
+  border: 3px solid #2ECC71;
 }
 
 .actions {

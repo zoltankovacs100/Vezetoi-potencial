@@ -28,7 +28,6 @@ const ITEMS = [
   { id: 9, dim: "B", text: "Gyakran addig tökéletesítek egy feladatot, hogy emiatt kicsúszok a határidőből." },
   { id: 10, dim: "B", text: "Fontos döntéseket többször elhalasztok, bízva benne, hogy magától tisztul a kép." },
   { id: 12, dim: "B", text: "Nyomás alatt kapkodok, és emiatt ismétlődő hibákat vétek." },
-  { id: 13, dim: "B", text: "Ha nincs \"tökéletes\" megoldás, késlekedem az elkezdéssel." },
   { id: 14, dim: "B", text: "Könnyen átcsúszom sürgős, de kevésbé fontos feladatokba a stratégiai munka helyett." },
   { id: 16, dim: "B", text: "Kudarc után hosszan tartóan visszaesik a teljesítményem és a motivációm." },
 
@@ -77,9 +76,9 @@ function scalePercent(score) {
   return ((clamped - 8) / (40 - 8)) * 100;
 }
 
-const Slider = ({ value, onChange }) => {
+const Slider = ({ value, onChange, isAnswered }) => {
   return (
-    <div className="slider">
+    <div className={`slider ${isAnswered ? 'answered' : ''}`}>
       <input
         type="range"
         min={1}
@@ -87,6 +86,12 @@ const Slider = ({ value, onChange }) => {
         step={1}
         value={value ?? 3}
         onChange={(e) => onChange(Number(e.target.value))}
+        onClick={(e) => {
+          // Ha null és éppen a 3-ason kattintunk
+          if (value === null) {
+            onChange(3);
+          }
+        }}
         aria-label="Likert skála csúszka 1–5"
       />
     </div>
@@ -143,7 +148,7 @@ const BarWithBands = ({ label, score, showLegend = false }) => {
 export default function VezetoiPotencialApp() {
   const shuffledItems = useMemo(() => shuffle(ITEMS), []);
   const [answers, setAnswers] = useState(() =>
-    Object.fromEntries(shuffledItems.map(q => [q.id, 3]))
+    Object.fromEntries(shuffledItems.map(q => [q.id, null]))
   );
   const [evaluated, setEvaluated] = useState(null);
   const printRef = useRef(null);
@@ -166,9 +171,16 @@ export default function VezetoiPotencialApp() {
   }, []);
 
   const compute = () => {
-    const sumA = ITEMS.filter(x => x.dim === "A").reduce((acc, x) => acc + (answers[x.id] ?? 3), 0);
-    const sumB = ITEMS.filter(x => x.dim === "B").reduce((acc, x) => acc + (answers[x.id] ?? 3), 0);
-    const sumC = ITEMS.filter(x => x.dim === "C").reduce((acc, x) => acc + (answers[x.id] ?? 3), 0);
+    // Ellenőrizzük, hogy minden kérdés válaszolva van-e
+    const unanswered = shuffledItems.filter(q => answers[q.id] === null);
+    if (unanswered.length > 0) {
+      alert(`Kérlek válaszolj minden kérdésre! Válaszolatlan kérdések száma: ${unanswered.length}`);
+      return;
+    }
+
+    const sumA = ITEMS.filter(x => x.dim === "A").reduce((acc, x) => acc + answers[x.id], 0);
+    const sumB = ITEMS.filter(x => x.dim === "B").reduce((acc, x) => acc + answers[x.id], 0);
+    const sumC = ITEMS.filter(x => x.dim === "C").reduce((acc, x) => acc + answers[x.id], 0);
     setEvaluated({ A: sumA, B: sumB, C: sumC });
     setTimeout(() => {
       document.getElementById("resultSection")?.scrollIntoView({ behavior: "smooth" });
@@ -237,6 +249,7 @@ export default function VezetoiPotencialApp() {
                 <Slider
                   value={answers[q.id]}
                   onChange={(v) => handleChange(q.id, v)}
+                  isAnswered={answers[q.id] !== null}
                 />
               </div>
             </div>
